@@ -32,21 +32,10 @@ type TransactionService struct {
 }
 
 // NewTransactionService Create a new TransactionService with a specified connectionInfo.
-func NewTransactionService(connectionInfo string) (*TransactionService, error) {
-	db, err := gorm.Open("postgres", connectionInfo)
-	if err != nil {
-		return nil, err
-	}
-
-	db.LogMode(true)
+func NewTransactionService(db *gorm.DB) (*TransactionService, error) {
 	return &TransactionService{
 		db: db,
 	}, nil
-}
-
-// Close Closes the TransactionService database connection.
-func (transService *TransactionService) Close() error {
-	return transService.db.Close()
 }
 
 // AutoMigrate will attempt to automatically migrate the transactions table
@@ -55,6 +44,15 @@ func (transService *TransactionService) AutoMigrate() error {
 		return err
 	}
 	return nil
+}
+
+// DestructiveReset drops the user table and rebuilds it.
+func (transService *TransactionService) DestructiveReset() error {
+	err := transService.db.DropTableIfExists(&Transaction{}).Error
+	if err != nil {
+		return err
+	}
+	return transService.AutoMigrate()
 }
 
 // first will query using the provided gorm.DB, and it will get the first item
@@ -96,23 +94,23 @@ func (transService *TransactionService) ReadAll() ([]Transaction, error) {
 	return transactions, nil
 }
 
-// Create will create the provided user and back-fill data like
+// Create will create the provided transaction and back-fill data like
 // the ID, CreatedAt, and UpdatedAt fields.
 func (transService *TransactionService) Create(transaction *Transaction) error {
 	return transService.db.Create(transaction).Error
 }
 
-// Update will update the provided user with all the data in the provided
+// Update will update the provided trasaction with all the data in the provided
 // user object.
-func (transService *TransactionService) Update(user *Transaction) error {
-	return transService.db.Save(user).Error
+func (transService *TransactionService) Update(transaction *Transaction) error {
+	return transService.db.Save(transaction).Error
 }
 
-// Delete will delete the user with the provided ID
+// Delete will delete the transaction with the provided ID
 func (transService *TransactionService) Delete(id uint) error {
 	if id == 0 { // Go default uint is 0, Gorm will delete all rows if id is not provided
 		return ErrInvalidID
 	}
-	user := Transaction{ID: id}
-	return transService.db.Delete(user).Error
+	trasaction := Transaction{ID: id}
+	return transService.db.Delete(trasaction).Error
 }

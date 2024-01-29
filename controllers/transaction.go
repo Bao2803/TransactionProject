@@ -21,13 +21,13 @@ func (tC *Transaction) NewModel(value float64, note interface{}, sender, receive
 		newNote = note.(string)
 	}
 
-	transaction := &models.Transaction{
+	newTransaction := &models.Transaction{
 		Value:    value,
 		Note:     newNote,
 		Sender:   sender,
 		Receiver: receiver,
 	}
-	return transaction, tC.transService.Create(transaction)
+	return newTransaction, tC.transService.Create(newTransaction)
 }
 
 // UpdateModel update an existed models.Transaction using the models.TransactionService
