@@ -12,10 +12,10 @@ import (
 
 // TODO: move to config file
 const (
-	host     = "transaction-project.postgres.database.azure.com"
+	host     = ""
 	port     = 5432
-	user     = "transaction"
-	password = "222Wwood"
+	user     = ""
+	password = ""
 	dbname   = "postgres"
 )
 
